@@ -1,44 +1,10 @@
-// Shim for requestAnimationFrame and getUserMedia
-(function (win, nav) {
-  "use strict";
-
-  win.requestAnimationFrame = win.requestAnimationFrame ||
-                              win.msRequestAnimationFrame ||
-                              win.mozRequestAnimationFrame ||
-                              win.webkitRequestAnimationFrame;
-
-  nav.getUserMedia = nav.getUserMedia ||
-                     nav.oGetUserMedia ||
-                     nav.msGetUserMedia ||
-                     nav.mozGetUserMedia ||
-                     nav.webkitGetUserMedia;
-
-  // Fallback for browsers that don't provide
-  // the requestAnimationFrame API (e.g. Opera).
-  if (!win.requestAnimationFrame) {
-    win.requestAnimationFrame = function (callback) {
-      setTimeout(callback, 0);
-    };
-  }
-
-  // Fallback for browsers that don't provide
-  // the URL.createObjectURL API (e.g. Opera).
-  if (!win.URL || !win.URL.createObjectURL) {
-    win.URL = win.URL || {};
-    win.URL.createObjectURL = function (obj) {
-      return obj;
-    };
-  }
-
-})(window, navigator);
-
-
 var chromalay = window.chromalay || (function(){
     var canvas, context, video, width, height, hsl, raf, gum_stream; overlay_active = false;
     var config = Reveal.getConfig().chromalay;
+    config.target = config.target || '.slides';
     config.shortcut = config.shortcut || 'c';
     config.picker = config.picker || 'g';
-    config.color = {
+    config.color = JSON.parse(localStorage.getItem('chromalay')) || {
         ht: 180,
         hb: 70,
         st: 100,
@@ -48,9 +14,9 @@ var chromalay = window.chromalay || (function(){
     };
 
     function startOverlay(){
-        var slides = document.querySelector('.slides');
-        width = slides.clientWidth;
-        height = slides.clientHeight;
+        var target = document.querySelector(config.target);
+        width = target.clientWidth;
+        height = target.clientHeight;
 
         canvas = document.createElement('canvas');
         canvas.width = width;
@@ -60,7 +26,7 @@ var chromalay = window.chromalay || (function(){
         canvas.style.left = '0px';
         canvas.style['z-index'] = 9999999;
         canvas.id = "c";
-        slides.appendChild(canvas);
+        target.appendChild(canvas);
         context = canvas.getContext("2d");
 
         video = document.createElement('video');
@@ -114,6 +80,7 @@ var chromalay = window.chromalay || (function(){
                 input.id = val;
                 input.onchange = function(evt){
                     config.color[val] = parseInt(evt.target.value);
+                    localStorage.setItem('chromalay', JSON.stringify(config.color));
                 }
                 document.body.appendChild(input);
             });
@@ -232,3 +199,37 @@ var chromalay = window.chromalay || (function(){
         return [h, s * 100, l * 100];
     }
 })();
+
+// Shim for requestAnimationFrame and getUserMedia
+(function (win, nav) {
+  "use strict";
+
+  win.requestAnimationFrame = win.requestAnimationFrame ||
+                              win.msRequestAnimationFrame ||
+                              win.mozRequestAnimationFrame ||
+                              win.webkitRequestAnimationFrame;
+
+  nav.getUserMedia = nav.getUserMedia ||
+                     nav.oGetUserMedia ||
+                     nav.msGetUserMedia ||
+                     nav.mozGetUserMedia ||
+                     nav.webkitGetUserMedia;
+
+  // Fallback for browsers that don't provide
+  // the requestAnimationFrame API (e.g. Opera).
+  if (!win.requestAnimationFrame) {
+    win.requestAnimationFrame = function (callback) {
+      setTimeout(callback, 0);
+    };
+  }
+
+  // Fallback for browsers that don't provide
+  // the URL.createObjectURL API (e.g. Opera).
+  if (!win.URL || !win.URL.createObjectURL) {
+    win.URL = win.URL || {};
+    win.URL.createObjectURL = function (obj) {
+      return obj;
+    };
+  }
+
+})(window, navigator);
