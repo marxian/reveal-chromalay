@@ -1,5 +1,5 @@
 {
-  "name": "reveal-chromalay",
+  "name": "@marxian/reveal-chromalay",
   "version": "1.0.0",
   "description": "A chromakey overlay plugin for reveal.js",
   "main": "index.js",
